@@ -1,0 +1,27 @@
+import base64
+import hashlib
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+
+# The encrypted message from the email
+encrypted_message = "U2FsdGVkX19H0MvIjRZPLu8UlIx4Z6FdV5JhN8UZX8s="
+
+# The secret key (somehow Alex finds or knows this key, for the sake of the story)
+secret_key = "th1s1sAS3cr3tK3y!"
+
+# Convert the secret key to a format suitable for AES decryption
+key = hashlib.sha256(secret_key.encode()).digest()
+
+def decrypt_message(encrypted_message, key):
+    try:
+        encrypted_message_bytes = base64.b64decode(encrypted_message)
+        iv = encrypted_message_bytes[:16]
+        cipher = AES.new(key, AES.MODE_CBC, iv)
+        decrypted_message = unpad(cipher.decrypt(encrypted_message_bytes[16:]), AES.block_size)
+        return decrypted_message.decode('utf-8')
+    except Exception as e:
+        return f"An error occurred: {e}"
+
+# Decrypt the message
+decrypted_message = decrypt_message(encrypted_message, key)
+print("Decrypted Message:", decrypted_message)
